@@ -3,7 +3,7 @@ import { z } from "zod";
 const serverSchema = z.object({
   AZURE_OPENAI_ENDPOINT: z
     .string()
-    .url()
+    .min(1)
     .optional()
     .describe("Azure OpenAI endpoint e.g. https://your-resource.openai.azure.com"),
   AZURE_OPENAI_API_KEY: z
@@ -63,18 +63,28 @@ const parsedServer = serverSchema.safeParse(process.env);
 
 export type ServerEnv = z.infer<typeof serverSchema>;
 
-export const serverEnv: ServerEnv = parsedServer.success ? parsedServer.data : {};
+// If parsing fails, log the error but continue with empty object
+if (!parsedServer.success) {
+  console.warn("Environment variable validation warnings:", parsedServer.error.issues);
+}
+
+export const serverEnv: Partial<ServerEnv> = parsedServer.success ? parsedServer.data : {};
+
+// Helper to get env var with fallback to process.env
+export function getEnvVar(key: keyof ServerEnv): string | undefined {
+  return serverEnv[key] || process.env[key];
+}
 
 export function requireServerEnv<Key extends keyof ServerEnv>(
   key: Key,
   featureHint?: string,
-): NonNullable<ServerEnv[Key]> {
-  const value = serverEnv[key];
+): string {
+  const value = serverEnv[key] || process.env[key];
 
   if (value === undefined || value === null || value === "") {
     const hintSuffix = featureHint ? ` (${featureHint})` : "";
     throw new Error(`Missing required environment variable: ${String(key)}${hintSuffix}`);
   }
 
-  return value as NonNullable<ServerEnv[Key]>;
+  return value;
 }

@@ -61,6 +61,7 @@ export type InterviewSessionPlan = {
   candidateId: string;
   questions: InterviewQuestion[];
   essayPrompt: EssayPrompt | null;
+  essayPrompts?: EssayPrompt[]; // Multiple essay prompts support
 };
 
 export type ResponseEvaluation = {
@@ -68,6 +69,21 @@ export type ResponseEvaluation = {
   transcript: string;
   toneAnalysis?: string;
   nonVerbalAnalysis?: string;
+  communicationClarity?: string;
+  confidenceAnalysis?: string;
+  strengths: string[];
+  improvements: string[];
+  scores: Record<string, number>;
+};
+
+export type EssayEvaluation = {
+  essayId: string;
+  prompt: string;
+  content: string;
+  wordCount: number;
+  writingClarity?: string;
+  structureAnalysis?: string;
+  depthAnalysis?: string;
   strengths: string[];
   improvements: string[];
   scores: Record<string, number>;
@@ -77,6 +93,7 @@ export type InterviewEvaluation = {
   overallScore: number;
   rubricScores: Record<string, number>;
   responses: ResponseEvaluation[];
+  essayEvaluations?: EssayEvaluation[]; // Essay evaluations (optional for backward compatibility)
 };
 
 export type PerformanceReport = {

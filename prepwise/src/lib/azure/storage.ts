@@ -22,7 +22,8 @@ export async function ensureContainer(containerName: string): Promise<void> {
   const exists = await containerClient.exists();
 
   if (!exists) {
-    await containerClient.create({ access: "private" });
+    // Container access is optional - default is private
+    await containerClient.create();
   }
 }
 

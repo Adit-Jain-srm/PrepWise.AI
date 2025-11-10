@@ -18,11 +18,11 @@ export function CandidateSummaryCard({ profile }: CandidateSummaryCardProps) {
     .join(" • ");
 
   return (
-    <section className="rounded-3xl border border-slate-200 bg-gradient-to-br from-white via-slate-50 to-slate-100 p-6 shadow-inner">
-      <header className="mb-4">
-        <h3 className="text-xl font-semibold text-slate-900">Profile Insights</h3>
-        <p className="mt-1 text-sm text-slate-600">
-          These highlights will drive the personalized interview.
+    <section className="rounded-3xl border border-slate-200 bg-gradient-to-br from-white via-blue-50/30 to-slate-50 p-6 shadow-lg">
+      <header className="mb-6">
+        <h3 className="text-2xl font-bold text-slate-900">Profile Insights</h3>
+        <p className="mt-2 text-sm text-slate-700 leading-relaxed">
+          These highlights will drive the personalized interview questions tailored to your unique background.
         </p>
       </header>
 

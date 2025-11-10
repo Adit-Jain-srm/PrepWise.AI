@@ -18,7 +18,7 @@ export function ResumeUploadCard({ onUploaded }: ResumeUploadCardProps) {
   const [resumeFile, setResumeFile] = useState<File | null>(null);
   const [essayFile, setEssayFile] = useState<File | null>(null);
   const [essayText, setEssayText] = useState("");
-  const [essayPrompt, setEssayPrompt] = useState("Explain your leadership philosophy.");
+  const [essayPrompt, setEssayPrompt] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -36,7 +36,10 @@ export function ResumeUploadCard({ onUploaded }: ResumeUploadCardProps) {
     try {
       const formData = new FormData();
       formData.append("resume", resumeFile);
-      formData.append("essayPrompt", essayPrompt);
+      // Only append essayPrompt if it's not empty (it's optional)
+      if (essayPrompt.trim().length > 0) {
+        formData.append("essayPrompt", essayPrompt.trim());
+      }
 
       if (essayFile) {
         formData.append("essayFile", essayFile);
@@ -51,11 +54,23 @@ export function ResumeUploadCard({ onUploaded }: ResumeUploadCardProps) {
         body: formData,
       });
 
-      if (!response.ok) {
-        throw new Error((await response.json())?.error ?? "Upload failed.");
+      // Check if response is JSON
+      const contentType = response.headers.get("content-type");
+      if (!contentType || !contentType.includes("application/json")) {
+        const text = await response.text();
+        console.error("Non-JSON response:", text);
+        throw new Error(
+          `Server error: ${response.status} ${response.statusText}. Please check your Azure credentials and try again.`,
+        );
       }
 
-      const payload = (await response.json()) as UploadResponse;
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data?.error ?? `Upload failed: ${response.status} ${response.statusText}`);
+      }
+
+      const payload = data as UploadResponse;
       onUploaded(payload);
     } catch (uploadError) {
       console.error(uploadError);
@@ -66,16 +81,16 @@ export function ResumeUploadCard({ onUploaded }: ResumeUploadCardProps) {
   };
 
   return (
-    <section className="rounded-3xl border border-slate-200 bg-white/70 p-6 shadow-lg backdrop-blur">
-      <header className="mb-4">
-        <p className="text-xs font-semibold uppercase tracking-widest text-sky-700">
+    <section className="rounded-3xl border border-slate-200 bg-gradient-to-br from-white to-slate-50/50 p-6 shadow-xl backdrop-blur-sm">
+      <header className="mb-6">
+        <p className="text-xs font-semibold uppercase tracking-widest text-sky-600">
           Step 1
         </p>
-        <h2 className="text-2xl font-semibold text-slate-900">
+        <h2 className="text-3xl font-bold text-slate-900 mt-2">
           Upload Resume &amp; Optional Essay
         </h2>
-        <p className="mt-1 text-sm text-slate-600">
-          We&apos;ll parse your background to personalize the interview.
+        <p className="mt-2 text-sm text-slate-700 leading-relaxed">
+          We&apos;ll parse your background to personalize the interview. Upload your resume and optionally include essay responses for deeper personalization.
         </p>
       </header>
 
@@ -99,9 +114,10 @@ export function ResumeUploadCard({ onUploaded }: ResumeUploadCardProps) {
             </label>
             <input
               type="text"
-              className="mt-2 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-200"
+              className="mt-2 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm placeholder:text-slate-400 focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-200"
               value={essayPrompt}
               onChange={(event) => setEssayPrompt(event.target.value)}
+              placeholder="e.g., Explain your leadership philosophy."
             />
           </div>
 
@@ -123,14 +139,14 @@ export function ResumeUploadCard({ onUploaded }: ResumeUploadCardProps) {
             Essay Text (optional)
           </label>
           <textarea
-            placeholder="Paste up to 200 words..."
-            rows={4}
-            className="mt-2 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-200"
+            placeholder="Paste your essay text (up to 500 words)..."
+            rows={5}
+            className="mt-2 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm placeholder:text-slate-400 focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-200"
             value={essayText}
             onChange={(event) => setEssayText(event.target.value)}
           />
           <p className="mt-1 text-right text-xs text-slate-500">
-            {essayText.trim().split(/\s+/).filter(Boolean).length} / 200 words
+            {essayText.trim().split(/\s+/).filter(Boolean).length} / 500 words
           </p>
         </div>
 
@@ -139,9 +155,16 @@ export function ResumeUploadCard({ onUploaded }: ResumeUploadCardProps) {
         <button
           type="submit"
           disabled={loading}
-          className="w-full rounded-xl bg-sky-600 px-4 py-2 text-sm font-semibold text-white shadow-lg transition hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-200 disabled:cursor-not-allowed disabled:bg-sky-300"
+          className="w-full rounded-xl bg-gradient-to-r from-sky-600 to-sky-700 px-6 py-3 text-sm font-semibold text-white shadow-lg transition-all hover:from-sky-700 hover:to-sky-800 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-sky-200 disabled:cursor-not-allowed disabled:from-sky-300 disabled:to-sky-300"
         >
-          {loading ? "Analyzing..." : "Analyze Profile"}
+          {loading ? (
+            <span className="flex items-center justify-center gap-2">
+              <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+              Analyzing Profile...
+            </span>
+          ) : (
+            "Analyze Profile"
+          )}
         </button>
       </form>
     </section>
