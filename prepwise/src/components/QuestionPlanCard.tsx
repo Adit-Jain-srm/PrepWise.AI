@@ -38,27 +38,27 @@ export function QuestionPlanCard({
           type="button"
           disabled={disabled}
           onClick={onStartInterview}
-          className="rounded-xl bg-sky-600 px-4 py-2 text-sm font-semibold text-white shadow-lg transition hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-200 disabled:cursor-not-allowed disabled:bg-sky-300"
+          className="rounded-xl bg-gradient-to-r from-sky-600 to-sky-700 px-6 py-3 text-sm font-semibold text-white shadow-lg transition-all hover:from-sky-700 hover:to-sky-800 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-sky-200 disabled:cursor-not-allowed disabled:from-sky-300 disabled:to-sky-300"
         >
-          Launch Mock Interview
+          🚀 Launch Mock Interview
         </button>
       </header>
 
-      <ol className="space-y-3">
+      <ol className="space-y-4">
         {questions.map((question, index) => (
           <li
             key={question.id}
-            className="rounded-2xl border border-slate-200 bg-slate-50/80 px-4 py-3 shadow-sm transition hover:border-sky-200 hover:bg-white"
+            className="rounded-2xl border-2 border-slate-200 bg-gradient-to-br from-white to-slate-50/50 px-5 py-4 shadow-md transition-all hover:border-sky-300 hover:shadow-lg"
           >
-            <div className="flex items-start justify-between gap-3">
-              <span className="inline-flex items-center rounded-full bg-sky-100 px-3 py-0.5 text-xs font-semibold uppercase tracking-widest text-sky-700">
+            <div className="flex items-start justify-between gap-3 mb-3">
+              <span className="inline-flex items-center rounded-full bg-gradient-to-r from-sky-100 to-sky-50 px-3 py-1 text-xs font-bold uppercase tracking-widest text-sky-700 shadow-sm">
                 {categoryLabels[question.category]}
               </span>
-              <span className="text-xs text-slate-500">
+              <span className="text-xs font-medium text-slate-600 bg-slate-100 px-2.5 py-1 rounded-full">
                 {question.preparationSeconds}s prep • {question.responseSeconds}s response
               </span>
             </div>
-            <p className="mt-2 text-sm font-medium text-slate-900">
+            <p className="text-base font-semibold text-slate-900 leading-relaxed">
               {index + 1}. {question.prompt}
             </p>
             {question.followUps?.length ? (
@@ -85,13 +85,13 @@ export function QuestionPlanCard({
       </ol>
 
       {essayPrompt && (
-        <div className="mt-6 rounded-2xl border border-purple-200 bg-purple-50/80 px-4 py-3 shadow-sm">
-          <p className="text-xs font-semibold uppercase tracking-widest text-purple-600">
-            Written Sim
+        <div className="mt-6 rounded-2xl border border-amber-200 bg-gradient-to-br from-amber-50 to-amber-100/50 px-5 py-4 shadow-sm">
+          <p className="text-xs font-semibold uppercase tracking-widest text-amber-600">
+            Written Simulation
           </p>
-          <p className="mt-1 text-sm font-medium text-purple-900">{essayPrompt.prompt}</p>
-          <p className="mt-1 text-xs text-purple-700">
-            Target {essayPrompt.targetWordCount} words
+          <p className="mt-2 text-sm font-medium text-amber-900">{essayPrompt.prompt}</p>
+          <p className="mt-2 text-xs text-amber-700 bg-amber-100/50 inline-block px-2 py-1 rounded">
+            Target: {essayPrompt.targetWordCount} words (Max: 500 words)
           </p>
         </div>
       )}

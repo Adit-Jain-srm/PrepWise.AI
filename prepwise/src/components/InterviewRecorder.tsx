@@ -34,6 +34,7 @@ export function InterviewRecorder({ questions, onComplete }: InterviewRecorderPr
   const [cameraError, setCameraError] = useState<string | null>(null);
   const [responses, setResponses] = useState<RecordedResponse[]>([]);
   const [currentPreviewUrl, setCurrentPreviewUrl] = useState<string | null>(null);
+  const [prepTimerInterval, setPrepTimerInterval] = useState<number | null>(null);
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const videoRecorderRef = useRef<MediaRecorder | null>(null);
@@ -43,6 +44,8 @@ export function InterviewRecorder({ questions, onComplete }: InterviewRecorderPr
   const recordStartRef = useRef<number | null>(null);
   const awayStartRef = useRef<number | null>(null);
   const awayTotalRef = useRef<number>(0);
+  const responsesRef = useRef<RecordedResponse[]>([]);
+  const recordingDurationRef = useRef<number>(0);
 
   const currentQuestion = questions[questionIndex];
 
@@ -125,8 +128,22 @@ export function InterviewRecorder({ questions, onComplete }: InterviewRecorderPr
       });
     }, 1000);
 
-    return () => window.clearInterval(interval);
+    setPrepTimerInterval(interval);
+
+    return () => {
+      window.clearInterval(interval);
+      setPrepTimerInterval(null);
+    };
   }, [stage, currentQuestion]);
+
+  const handleSkipPrep = () => {
+    if (prepTimerInterval) {
+      window.clearInterval(prepTimerInterval);
+      setPrepTimerInterval(null);
+    }
+    setPrepRemaining(0);
+    setStage("record");
+  };
 
   useEffect(() => {
     if (stage !== "record") {
@@ -137,6 +154,7 @@ export function InterviewRecorder({ questions, onComplete }: InterviewRecorderPr
     setRecordRemaining(currentQuestion.responseSeconds);
 
     const interval = window.setInterval(() => {
+      recordingDurationRef.current += 1;
       setRecordRemaining((seconds) => {
         if (seconds <= 1) {
           window.clearInterval(interval);
@@ -171,6 +189,7 @@ export function InterviewRecorder({ questions, onComplete }: InterviewRecorderPr
     videoChunksRef.current = [];
     audioChunksRef.current = [];
     awayTotalRef.current = 0;
+    recordingDurationRef.current = 0;
     recordStartRef.current = performance.now();
 
     const videoRecorder = new MediaRecorder(mediaStream, {
@@ -242,11 +261,10 @@ export function InterviewRecorder({ questions, onComplete }: InterviewRecorderPr
       },
     };
 
-    setResponses((prev) => {
-      const next = [...prev];
-      next[questionIndex] = response;
-      return next;
-    });
+    const updatedResponses = [...responsesRef.current];
+    updatedResponses[questionIndex] = response;
+    responsesRef.current = updatedResponses;
+    setResponses(updatedResponses);
   };
 
   const handleRetake = () => {
@@ -267,7 +285,9 @@ export function InterviewRecorder({ questions, onComplete }: InterviewRecorderPr
 
     if (isLastQuestion) {
       setStage("completed");
-      onComplete(responses.filter(Boolean));
+      // Use ref to get the latest responses synchronously
+      const completedResponses = responsesRef.current.filter(Boolean);
+      onComplete(completedResponses);
     } else {
       const nextIndex = questionIndex + 1;
       setQuestionIndex(nextIndex);
@@ -288,21 +308,21 @@ export function InterviewRecorder({ questions, onComplete }: InterviewRecorderPr
   }, [stage, prepRemaining, recordRemaining, currentQuestion]);
 
   return (
-    <section className="rounded-3xl border border-slate-200 bg-slate-900/90 p-6 text-white shadow-xl">
-      <header className="mb-4">
-        <p className="text-xs font-semibold uppercase tracking-widest text-sky-300">
+    <section className="rounded-3xl border border-slate-700 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-6 text-white shadow-2xl">
+      <header className="mb-6">
+        <p className="text-xs font-semibold uppercase tracking-widest text-sky-400">
           Step 3
         </p>
-        <h2 className="text-2xl font-semibold text-white">Mock Interview Studio</h2>
-        <p className="mt-1 text-sm text-slate-200">
+        <h2 className="text-3xl font-bold text-white mt-2">Mock Interview Studio</h2>
+        <p className="mt-2 text-sm text-slate-300 leading-relaxed">
           {cameraError
             ? cameraError
-            : "We manage the timers. Focus on storytelling and presence."}
+            : "We manage the timers. Focus on storytelling, impact metrics, and presence. You can skip prep time if you're ready."}
         </p>
       </header>
 
       <div className="grid gap-6 lg:grid-cols-[2fr_1fr]">
-        <div className="relative overflow-hidden rounded-3xl border border-slate-700 bg-black">
+        <div className="relative overflow-hidden rounded-3xl border-2 border-slate-600 bg-black shadow-2xl">
           <video
             ref={videoRef}
             autoPlay
@@ -310,23 +330,50 @@ export function InterviewRecorder({ questions, onComplete }: InterviewRecorderPr
             playsInline
             className="aspect-video w-full bg-black object-cover"
           />
-          <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-4">
-            <p className="text-xs font-semibold uppercase tracking-wide text-slate-200">
-              Question {questionIndex + 1} of {questions.length}
-            </p>
-            <p className="mt-1 text-lg font-semibold text-white">{currentQuestion.prompt}</p>
+          <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/60 to-transparent p-5">
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-xs font-semibold uppercase tracking-wide text-sky-300 bg-sky-900/50 px-3 py-1 rounded-full">
+                Question {questionIndex + 1} of {questions.length}
+              </p>
+              <span className="text-xs font-medium text-slate-300 bg-slate-800/70 px-2 py-1 rounded">
+                {currentQuestion.category}
+              </span>
+            </div>
+            <p className="text-lg font-bold text-white leading-tight">{currentQuestion.prompt}</p>
           </div>
         </div>
 
         <aside className="flex flex-col gap-4">
-          <div className="rounded-2xl border border-slate-700 bg-slate-800 p-4">
-            <p className="text-xs font-semibold uppercase tracking-widest text-slate-400">
-              Timer
+          <div className="rounded-2xl border-2 border-slate-600 bg-gradient-to-br from-slate-800 to-slate-900 p-5 shadow-lg">
+            <p className="text-xs font-semibold uppercase tracking-widest text-slate-400 mb-3">
+              {visualTimerValue.label}
             </p>
-            <p className="mt-2 text-4xl font-semibold text-white">
-              {visualTimerValue.value.toString().padStart(2, "0")}s
-            </p>
-            <p className="mt-1 text-sm text-slate-300">{visualTimerValue.label}</p>
+            <div className="flex items-baseline gap-2">
+              <p className="text-5xl font-bold text-white">
+                {visualTimerValue.value.toString().padStart(2, "0")}
+              </p>
+              <p className="text-xl font-medium text-slate-300">s</p>
+            </div>
+            {stage === "prep" && (
+              <div className="mt-4 h-2 w-full rounded-full bg-slate-700 overflow-hidden">
+                <div
+                  className="h-full bg-gradient-to-r from-sky-500 to-sky-600 transition-all duration-1000"
+                  style={{
+                    width: `${(prepRemaining / currentQuestion.preparationSeconds) * 100}%`,
+                  }}
+                />
+              </div>
+            )}
+            {stage === "record" && (
+              <div className="mt-4 h-2 w-full rounded-full bg-slate-700 overflow-hidden">
+                <div
+                  className="h-full bg-gradient-to-r from-emerald-500 to-emerald-600 transition-all duration-1000"
+                  style={{
+                    width: `${(recordRemaining / currentQuestion.responseSeconds) * 100}%`,
+                  }}
+                />
+              </div>
+            )}
           </div>
 
           <div className="flex flex-col gap-2">
@@ -341,14 +388,34 @@ export function InterviewRecorder({ questions, onComplete }: InterviewRecorderPr
               </button>
             )}
             {stage === "prep" && (
-              <p className="rounded-2xl border border-slate-700 bg-slate-800 px-4 py-3 text-sm text-slate-200">
-                Use the countdown to outline your story. Recording will start automatically.
-              </p>
+              <div className="space-y-3">
+                <div className="rounded-2xl border border-slate-600 bg-slate-800/80 px-4 py-3 backdrop-blur-sm">
+                  <p className="text-sm font-medium text-slate-200 mb-1">
+                    💡 Preparation Time
+                  </p>
+                  <p className="text-xs text-slate-300 leading-relaxed">
+                    Use this time to outline your story using the STAR method. Recording will start automatically when time expires.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  className="w-full rounded-xl border-2 border-sky-500/60 bg-sky-500/20 px-4 py-3 text-sm font-semibold text-sky-200 transition-all hover:bg-sky-500/30 hover:border-sky-400 hover:shadow-lg"
+                  onClick={handleSkipPrep}
+                >
+                  ⏩ Skip Prep & Start Recording
+                </button>
+              </div>
             )}
             {stage === "record" && (
-              <p className="rounded-2xl border border-emerald-500/40 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-200">
-                Recording in progress. Stay focused on one clear narrative with impact metrics.
-              </p>
+              <div className="rounded-2xl border-2 border-emerald-500/60 bg-emerald-500/10 px-4 py-3 backdrop-blur-sm">
+                <p className="text-sm font-semibold text-emerald-200 mb-1 flex items-center gap-2">
+                  <span className="inline-flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                  Recording in Progress
+                </p>
+                <p className="text-xs text-emerald-300 leading-relaxed">
+                  Stay focused on one clear narrative with impact metrics. Speak clearly and maintain eye contact with the camera.
+                </p>
+              </div>
             )}
             {stage === "review" && currentPreviewUrl && (
               <div className="space-y-3">
@@ -357,20 +424,20 @@ export function InterviewRecorder({ questions, onComplete }: InterviewRecorderPr
                   src={currentPreviewUrl}
                   className="w-full rounded-2xl border border-slate-700"
                 />
-                <div className="flex gap-2">
+                <div className="flex gap-3">
                   <button
                     type="button"
-                    className="flex-1 rounded-2xl border border-slate-600 bg-slate-800 px-4 py-2 text-sm font-semibold text-slate-200 hover:bg-slate-700"
+                    className="flex-1 rounded-xl border-2 border-slate-500 bg-slate-800 px-4 py-3 text-sm font-semibold text-slate-200 transition-all hover:bg-slate-700 hover:border-slate-400"
                     onClick={handleRetake}
                   >
-                    Retake
+                    🔄 Retake
                   </button>
                   <button
                     type="button"
-                    className="flex-1 rounded-2xl bg-sky-500 px-4 py-2 text-sm font-semibold text-white hover:bg-sky-600"
+                    className="flex-1 rounded-xl bg-gradient-to-r from-sky-500 to-sky-600 px-4 py-3 text-sm font-semibold text-white shadow-lg transition-all hover:from-sky-600 hover:to-sky-700 hover:shadow-xl"
                     onClick={handleContinue}
                   >
-                    Continue
+                    ✓ Continue
                   </button>
                 </div>
               </div>

@@ -1,0 +1,54 @@
+# PrepWise.AI Root .gitignore
+
+# Dependencies
+node_modules/
+.pnp
+.pnp.*
+
+# Environment files (DO NOT COMMIT - contains sensitive Azure credentials)
+.env
+.env.local
+.env*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+tmp/
+temp/
+
+# Build outputs
+dist/
+build/
+.next/
+out/
+
+# Vercel
+.vercel
+
+# TypeScript
+*.tsbuildinfo
+
+# Documentation (keep docs folder, but ignore generated docs)
+*.pdf
+*.docx
+
+# Test coverage
+coverage/
+
+# Misc
+*.pem
+.cache/
+
