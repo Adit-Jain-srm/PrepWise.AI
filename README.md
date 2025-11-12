@@ -23,6 +23,7 @@ Build an AI-Powered MBA Mock Interview Portal featuring:
 - **Team Name:** Arize
 - **Team Leader:** Adit Jain
 - **Registration No:** RA2311026030176
+- **Live Deployment (vercel):** https://prep-wise-k6nm3kpbx-aj5.vercel.app
 - **YouTube Video:** https://youtu.be/iWFEWtzod9k
 - **GitHub Repository:** [https://github.com/Adit-Jain-srm/PrepWise.AI](https://github.com/Adit-Jain-srm/PrepWise.AI)
 
