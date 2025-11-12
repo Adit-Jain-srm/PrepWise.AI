@@ -30,17 +30,18 @@
 
 ---
 
-### 3. "Failed to parse PDF file" Error
+### 3. "Failed to parse PDF file" / "DOMMatrix is not defined" Error
 
-**Symptom**: Error message "Failed to parse PDF file: pdfParse is not a function" or similar.
+**Symptom**: Error message "Failed to parse PDF file: DOMMatrix is not defined" when deploying to Vercel or in serverless environments.
 
 **Solution**:
-- This is fixed by using pdf-parse v2 class-based API
+- This is fixed by using `pdf-parse` v1.1.1 which is serverless-compatible (v2 uses browser APIs)
 - Ensure `serverExternalPackages: ["pdf-parse"]` is configured in `next.config.ts`
-- The system now uses `new PDFParse({ data: buffer }).getText()` instead of a function call
+- The API route uses `runtime = "nodejs"` to ensure Node.js runtime on Vercel
+- Run `npm install` after pulling the latest changes to get the correct version
 - Restart the development server after changes
 
-**Prevention**: The system uses pdf-parse v2 API correctly and configures `serverExternalPackages` in Next.js config.
+**Prevention**: The system uses `pdf-parse` v1.1.1 which works in serverless environments, and the API route is configured with Node.js runtime.
 
 ---
 

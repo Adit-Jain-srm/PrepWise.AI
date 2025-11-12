@@ -6,7 +6,7 @@ import { CandidateEssay, CandidateProfile } from "@/lib/types/interview";
 import { saveInterviewAsset } from "@/lib/services/storageService";
 import { serverEnv, getEnvVar } from "@/lib/env";
 
-export const dynamic = "force-dynamic";
+export const dynamic = "force-dynamic"; // Ensures Node.js runtime on Vercel (not Edge)
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
   try {
