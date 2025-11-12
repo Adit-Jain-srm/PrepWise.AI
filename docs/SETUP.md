@@ -120,11 +120,15 @@ git push origin main
 ### 2. Deploy to Vercel
 
 1. Import your GitHub repository in Vercel
-2. Configure environment variables in Vercel Project Settings
-3. Add all environment variables from `.env.local`
-4. Set the build command to `npm run build` (default)
-5. Set the output directory to `.next` (default)
-6. Deploy
+2. **Configure Build Settings:**
+   - **Framework Preset**: `Next.js` (auto-detected)
+   - **Root Directory**: `prepwise` (important: the app is in the `prepwise` subdirectory)
+   - **Build Command**: `npm run build` (default)
+   - **Output Directory**: `.next` (default)
+   - **Install Command**: `npm install` (default)
+3. Configure environment variables in Vercel Project Settings
+4. Add all environment variables from `.env.local`
+5. Deploy
 
 ### 3. Post-Deployment
 
@@ -189,6 +193,13 @@ git push origin main
    - This is fixed in the latest version
    - All form inputs now have explicit text colors
    - Refresh your browser to see the changes
+
+9. **"DOMMatrix is not defined" (Vercel deployment)**
+   - This error occurs when `pdf-parse` v2 tries to use browser APIs in serverless environments
+   - **Solution**: The project now uses `pdf-parse` v1.1.1 which is serverless-compatible
+   - Ensure you've run `npm install` after pulling the latest changes
+   - The API route is configured with `runtime = "nodejs"` to ensure Node.js runtime on Vercel
+   - If the error persists, verify that `next.config.ts` includes `pdf-parse` in `serverExternalPackages`
 
 ### Debug Mode
 

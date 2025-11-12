@@ -222,7 +222,7 @@ PrepWise.AI is a comprehensive AI-powered MBA mock interview portal that has bee
 **Optional**:
 - `SUPABASE_URL` (falls back to in-memory if not provided)
 - `SUPABASE_SERVICE_ROLE_KEY` (falls back to in-memory if not provided)
-- `AZURE_OPENAI_API_VERSION` (defaults to `2024-10-01-preview`)
+- `AZURE_OPENAI_API_VERSION`
 
 ## Deployment
 
@@ -236,7 +236,6 @@ PrepWise.AI is a comprehensive AI-powered MBA mock interview portal that has bee
 - Azure OpenAI deployment (gpt-4o)
 - Azure Blob Storage account
 - Azure Speech Service
-- (Optional) Supabase project
 
 ### Next.js Configuration
 - `serverExternalPackages`: Configured for CommonJS modules (pdf-parse, Azure Speech SDK)
@@ -322,7 +321,6 @@ PrepWise.AI is a comprehensive AI-powered MBA mock interview portal that has bee
 - ✅ Color-coded validation for essay word counts
 - ✅ Progress bars for timers
 - ✅ Loading states and error messages
-- ✅ Hackathon-winning UI design
 
 ## Conclusion
 

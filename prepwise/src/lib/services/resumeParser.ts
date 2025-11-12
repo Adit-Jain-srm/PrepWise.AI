@@ -108,47 +108,15 @@ export async function extractTextFromResume(file: File | Blob): Promise<string> 
     if (mimeType.includes("pdf")) {
       console.log("Parsing PDF file...");
       try {
-        // pdf-parse v2 uses a class-based API
-        // Import the PDFParse class
+        // pdf-parse v1 uses a simple function-based API that works in serverless environments
         // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
-        const pdfParseModule = require("pdf-parse") as any;
+        const pdfParse = require("pdf-parse") as (data: Buffer) => Promise<{ text: string }>;
         
-        // pdf-parse v2 exports PDFParse as a named export
-        // Handle both CommonJS require and potential webpack wrapping
-        let PDFParseClass: any;
+        console.log("Extracting text from PDF...");
+        const result = await pdfParse(buffer);
         
-        if (pdfParseModule.PDFParse && typeof pdfParseModule.PDFParse === "function") {
-          // Named export
-          PDFParseClass = pdfParseModule.PDFParse;
-        } else if (pdfParseModule.default?.PDFParse && typeof pdfParseModule.default.PDFParse === "function") {
-          // Wrapped in default
-          PDFParseClass = pdfParseModule.default.PDFParse;
-        } else if (typeof pdfParseModule === "function") {
-          // Direct export (unlikely in v2, but handle it)
-          PDFParseClass = pdfParseModule;
-        } else {
-          throw new Error(
-            `Cannot find PDFParse class in pdf-parse module. Module type: ${typeof pdfParseModule}, ` +
-            `keys: ${Object.keys(pdfParseModule || {}).slice(0, 10).join(", ")}`
-          );
-        }
-        
-        console.log("Instantiating PDFParse with buffer...");
-        // pdf-parse v2: Create an instance with the buffer
-        // The constructor accepts { data: Buffer } or { buffer: Buffer }
-        const parser = new PDFParseClass({ data: buffer });
-        
-        try {
-          console.log("Extracting text from PDF...");
-          // Call getText() method to extract text
-          const result = await parser.getText();
-          
-          console.log(`PDF parsed successfully, extracted ${result.text.length} characters`);
-          return result.text;
-        } finally {
-          // Clean up resources
-          await parser.destroy();
-        }
+        console.log(`PDF parsed successfully, extracted ${result.text.length} characters`);
+        return result.text;
       } catch (pdfError) {
         console.error("Error parsing PDF:", pdfError);
         throw new Error(`Failed to parse PDF file: ${pdfError instanceof Error ? pdfError.message : String(pdfError)}`);
