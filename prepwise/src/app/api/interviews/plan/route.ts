@@ -6,13 +6,16 @@ import {
   saveInterviewSessionPlan,
 } from "@/lib/db/interviewRepository";
 import { generateInterviewSessionPlan } from "@/lib/services/questionGenerator";
+import { generatePremiumInterviewSessionPlan } from "@/lib/services/premiumQuestionGenerator";
 import { CandidateProfile } from "@/lib/types/interview";
+import { getUserFromRequest } from "@/lib/auth/server";
 
 type PlanRequestBody = {
   candidateId?: string;
   profile?: CandidateProfile;
   questionCount?: number;
   sessionId?: string;
+  targetSchools?: string[];
 };
 
 export const dynamic = "force-dynamic";
@@ -29,8 +32,19 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Try to get user from auth (optional for backward compatibility)
+    let userTier: "free" | "premium" | "enterprise" = "free";
+    try {
+      const authResult = await getUserFromRequest(request);
+      if (authResult) {
+        userTier = authResult.tier;
+      }
+    } catch {
+      // Not authenticated, use free tier
+    }
+
     const candidateId = body.candidateId ?? crypto.randomUUID();
-    const questionCount = body.questionCount ?? 5;
+    const questionCount = body.questionCount ?? (userTier !== "free" ? 7 : 5);
     const sessionId = body.sessionId ?? crypto.randomUUID();
 
     // Prefer profile from request body (more reliable), fallback to loading from store
@@ -62,12 +76,19 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    console.log(`Generating interview plan for candidateId: ${candidateId}, sessionId: ${sessionId}`);
+    console.log(`Generating interview plan for candidateId: ${candidateId}, sessionId: ${sessionId}, tier: ${userTier}`);
     
-    const plan = await generateInterviewSessionPlan(candidateId, profile, {
-      sessionId,
-      questionCount,
-    });
+    // Use premium generator for premium/enterprise users, standard for free
+    const plan = userTier !== "free"
+      ? await generatePremiumInterviewSessionPlan(candidateId, profile, {
+          sessionId,
+          questionCount,
+          targetSchools: body.targetSchools,
+        })
+      : await generateInterviewSessionPlan(candidateId, profile, {
+          sessionId,
+          questionCount,
+        });
 
     await saveInterviewSessionPlan(plan);
 

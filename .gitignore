@@ -6,9 +6,7 @@ node_modules/
 .pnp.*
 
 # Environment files (DO NOT COMMIT - contains sensitive Azure credentials)
-.env
 .env.local
-.env*.local
 
 # IDE
 .vscode/

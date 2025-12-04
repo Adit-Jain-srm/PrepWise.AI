@@ -30,9 +30,8 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (DO NOT COMMIT - contains sensitive Azure credentials)
-.env*
-!.env.example
+# env files
+.env.local
 
 # vercel
 .vercel
