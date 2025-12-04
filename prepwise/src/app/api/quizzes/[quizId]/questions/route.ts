@@ -78,8 +78,20 @@ export async function GET(
       }
     }
 
+    // Ensure quiz exists after all generation attempts
+    if (!quiz) {
+      return NextResponse.json(
+        { error: "Quiz not found and could not be generated" },
+        { status: 404 }
+      );
+    }
+
+    // At this point, TypeScript knows quiz is not null due to the early return above
+    // Use a const assertion to make it explicit for TypeScript
+    const validQuiz = quiz;
+
     // Return questions from stored quiz (hide correct answers from user, but include in response for grading)
-    const questionsWithoutAnswers = quiz.questions_json.map((q) => ({
+    const questionsWithoutAnswers = validQuiz.questions_json.map((q) => ({
       id: q.id,
       question: q.question,
       type: q.type,
@@ -89,12 +101,12 @@ export async function GET(
 
     // Include correct answers map for client-side grading (will be stored in frontend)
     const correctAnswersMap: Record<string, string | string[]> = {};
-    quiz.questions_json.forEach((q) => {
+    validQuiz.questions_json.forEach((q) => {
       correctAnswersMap[q.id] = q.correctAnswer;
     });
 
     return NextResponse.json({
-      quizId: quiz.id,
+      quizId: validQuiz.id,
       questions: questionsWithoutAnswers,
       correctAnswers: correctAnswersMap, // Include for grading on submit
       generated: false,
