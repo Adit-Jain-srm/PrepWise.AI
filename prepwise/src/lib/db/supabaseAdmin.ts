@@ -8,6 +8,10 @@ export function getSupabaseAdmin(): SupabaseClient {
     return supabaseClient;
   }
 
+  if (!isSupabaseConfigured()) {
+    throw new Error("Supabase is not configured. Please set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY environment variables.");
+  }
+
   const url = requireServerEnv("SUPABASE_URL", "Supabase persistence");
   const key = requireServerEnv("SUPABASE_SERVICE_ROLE_KEY", "Supabase persistence");
 
