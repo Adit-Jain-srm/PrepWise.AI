@@ -1,5 +1,6 @@
 import { getSupabaseAdmin, isSupabaseConfigured } from "./supabaseAdmin";
-import { InterviewRecordingSummary, CandidateProfile, InterviewSessionPlan, InterviewEvaluation } from "../types/user";
+import { InterviewRecordingSummary } from "../types/user";
+import { CandidateProfile, InterviewSessionPlan, InterviewEvaluation } from "../types/interview";
 
 type RecordingRecord = {
   id: string;
