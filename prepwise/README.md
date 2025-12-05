@@ -1,16 +1,24 @@
 # PrepWise.AI
 
-AI-powered portal for MBA mock interviews. Candidates upload their resume and optional essays; the platform parses their profile, generates a tailored question set, records a live video simulation, scores verbal/non‑verbal cues via Azure services, and produces a downloadable PDF coaching report.
+AI-powered comprehensive MBA interview preparation platform. Candidates upload their resume and optional essays; the platform parses their profile, generates personalized question sets, records live video simulations, scores verbal/non‑verbal cues via Azure services, and produces downloadable PDF coaching reports. Includes premium subscriptions, personalized quizzes, learning content, MBA news feed, and recording history.
 
 ## Feature Highlights
 
+### Core Interview Features
 - **Resume & Essay Intake** – PDF/DOCX parsing backed by Azure OpenAI structured outputs and optional essay ingestion.
-- **Personalized Interview Plan** – LangChain + Azure OpenAI craft behavioral, situational, and school-fit questions.
+- **Personalized Interview Plan** – LangChain + Azure OpenAI craft behavioral, situational, and school-fit questions. Premium users get 7+ highly personalized questions vs 5 for free users.
 - **Written Essay Simulation** – 250-word target (500-word maximum) essay responses with real-time word count validation and color-coded feedback.
 - **Video Interview Studio** – MediaRecorder-based interface with skip prep option, 30s prep/60s response timers, dual audio/video capture, and comprehensive non-verbal analysis.
 - **AI Evaluation Engine** – Azure Speech SDK transcription, filler/pace analytics, enhanced evaluation with tone analysis, confidence analysis, and communication clarity. LangChain scoring prompts, and radar/bar visualizations (Plotly).
 - **PDF Coaching Report** – PDFKit-powered export including rubric breakdowns and question-level feedback.
-- **Storage & Persistence** – Azure Blob Storage for assets; Supabase (optional) for profiles/sessions/evaluations.
+
+### Platform Features
+- **Premium Subscription System** – Three-tier system (Free, Premium $29.99/month, Enterprise $99.99/month) with feature gating and paywall protection.
+- **Interview Recording History** – View all past mock interviews with search and filter capabilities. Free users: last 3 recordings; Premium: unlimited.
+- **Personalized Quiz System** – Multiple quiz categories (Behavioral, Leadership, School-Specific, Technical) with difficulty levels and instant feedback.
+- **Learning Hub** – Curated videos, articles, podcasts, and courses with personalized recommendations and progress tracking.
+- **MBA News Feed** – Latest MBA world news categorized by Admissions, Career, Schools, and Trends.
+- **Storage & Persistence** – Azure Blob Storage for assets; Supabase for user profiles, sessions, evaluations, subscriptions, and content.
 
 ## Architecture Overview
 
@@ -78,14 +86,29 @@ npm run lint
 
 ### Important API Routes
 
+#### Interview Flow
 | Route | Method | Purpose |
 | --- | --- | --- |
 | `/api/candidates/parse` | POST (multipart) | Upload resume/essay → parse + store profile |
-| `/api/interviews/plan` | POST | Generate tailored question plan (accepts profile from frontend) |
+| `/api/interviews/plan` | POST | Generate tailored question plan (accepts profile from frontend, tier-aware) |
 | `/api/interviews/transcribe` | POST (multipart) | Audio blob → Azure Speech transcription + speech metrics (handles missing audio gracefully) |
 | `/api/interviews/evaluate` | POST | Responses → Azure/LangChain evaluation (accepts plan and profile from frontend) |
 | `/api/interviews/assets` | POST (multipart) | Persist audio/video/essay resources to Blob Storage (optional, non-blocking) |
+| `/api/interviews/save` | POST | Save interview session to database |
 | `/api/interviews/report` | POST | Generate PDF report for a session |
+
+#### Platform Features
+| Route | Method | Purpose |
+| --- | --- | --- |
+| `/api/auth/user` | GET | Get current authenticated user and subscription tier |
+| `/api/dashboard` | GET | Get user dashboard data (recordings, progress, stats) |
+| `/api/quizzes` | GET | List available quizzes (tier-aware) |
+| `/api/quizzes/[quizId]/questions` | GET | Get quiz questions |
+| `/api/quizzes/[quizId]/submit` | POST | Submit quiz answers and get score |
+| `/api/recordings` | GET | List user's interview recordings (tier-aware limits) |
+| `/api/recordings/[sessionId]` | GET | Get specific recording details |
+| `/api/learn` | GET | Get learning content (tier-aware) |
+| `/api/news` | GET | Get MBA news feed |
 | `/api/health` | GET | Health check and configuration verification |
 
 ## Deployment (Vercel)
@@ -100,28 +123,66 @@ npm run lint
 
 ## Recent Enhancements
 
-### Prompt Engineering Improvements
+### Platform Transformation (2024)
+PrepWise.AI has been transformed from a single-session mock interview tool into a comprehensive MBA interview preparation platform with:
+
+#### Premium Subscription System 💎
+- Three-tier system: Free, Premium ($29.99/month), Enterprise ($99.99/month)
+- Tier-based access control throughout the platform
+- Paywall gates for premium features
+- Visual premium indicators and badges
+- Automatic tier detection in API routes
+
+#### Enhanced Question Generation 🎯
+- **Free Tier**: 5 basic interview questions
+- **Premium Tier**: 7+ highly personalized questions referencing specific experiences
+- Target school integration for premium users
+- Enhanced essay prompts with deeper analysis
+- Premium question generator service with detailed candidate analysis
+
+#### Interview Recording History 📹
+- Recording library with search and filter capabilities
+- Free users: Last 3 recordings; Premium: Unlimited
+- Detailed view with full evaluations and recordings
+- Progress tracking over time
+- Azure Blob Storage integration for video/audio files
+
+#### Personalized Quiz System 📝
+- Multiple quiz categories: Behavioral, Leadership, School-Specific, Technical
+- Difficulty levels: Beginner, Intermediate, Advanced
+- Interactive interface with multiple choice, true/false, short answer
+- Instant feedback with scoring and explanations
+- Progress tracking for quiz attempts
+
+#### Learning Ecosystem 📚
+- Curated videos, articles, podcasts, and courses
+- Personalized content recommendations based on profile
+- Progress tracking with bookmarks and ratings
+- Categorized by topic and difficulty
+- Premium exclusive content library
+
+#### MBA News Feed 📰
+- Latest MBA world news and updates
+- Categories: Admissions, Career, Schools, Trends
+- Featured articles and personalized feed
+- Source attribution and credibility
+
+### Technical Improvements
 - Enhanced system prompts for question generation with detailed evaluation frameworks
 - Improved essay prompt generation (250-word target, 500-word maximum)
 - Better personalization based on candidate background
 - JSON mode for reliable parsing
-
-### Evaluation Engine Enhancements
 - Added tone analysis for vocal characteristics
 - Added confidence analysis for presence assessment
 - Added communication clarity analysis
 - Enhanced non-verbal cue analysis
 - Improved feedback quality with specific, actionable insights
-
-### Edge Case Handling
 - Handle missing audio/video gracefully
 - Continue evaluation with placeholder data if transcription fails
 - Send profile and plan from frontend to avoid store lookup issues
 - Handle server restarts without losing data (frontend state persistence)
 - Empty essay prompt field (not auto-filled)
 - Graceful error handling throughout the application
-
-### UI/UX Improvements
 - Fixed color scheme issues (white-on-white text)
 - Improved accessibility with better contrast ratios
 - Enhanced visual hierarchy with gradients and shadows
@@ -171,22 +232,77 @@ prepwise/
 ├── src/
 │   ├── app/                    # Next.js App Router
 │   │   ├── api/               # API routes
+│   │   │   ├── auth/          # Authentication
 │   │   │   ├── candidates/    # Resume parsing
-│   │   │   └── interviews/    # Interview flow APIs
-│   │   ├── layout.tsx         # Root layout
-│   │   └── page.tsx           # Main page
+│   │   │   ├── dashboard/     # User dashboard
+│   │   │   ├── interviews/    # Interview flow APIs
+│   │   │   ├── quizzes/       # Quiz system
+│   │   │   ├── recordings/    # Recording history
+│   │   │   ├── learn/         # Learning content
+│   │   │   └── news/          # MBA news feed
+│   │   ├── dashboard/         # Dashboard page
+│   │   ├── history/           # Recording history page
+│   │   ├── interview/         # Main interview page
+│   │   ├── quizzes/           # Quiz pages
+│   │   ├── learn/             # Learning hub page
+│   │   ├── news/              # News feed page
+│   │   ├── pricing/           # Pricing page
+│   │   ├── layout.tsx         # Root layout with AuthProvider
+│   │   └── page.tsx           # Landing page
 │   ├── components/            # React components
+│   │   ├── AuthProvider.tsx   # Authentication context
+│   │   ├── PaywallGate.tsx    # Premium feature gating
+│   │   ├── PremiumBadge.tsx   # Premium indicators
 │   │   ├── ResumeUploadCard.tsx
 │   │   ├── InterviewRecorder.tsx
 │   │   ├── PerformanceDashboard.tsx
-│   │   └── ...
+│   │   └── Navigation.tsx     # Multi-page navigation
 │   └── lib/                   # Shared libraries
+│       ├── auth/              # Auth utilities (client/server)
 │       ├── azure/             # Azure service clients
 │       ├── db/                # Database repositories
+│       │   ├── interviewRepository.ts
+│       │   ├── quizRepository.ts
+│       │   ├── recordingRepository.ts
+│       │   └── userRepository.ts
 │       ├── services/          # Business logic
+│       │   ├── premiumQuestionGenerator.ts
+│       │   ├── questionGenerator.ts
+│       │   ├── quizGenerator.ts
+│       │   └── ...
 │       └── types/             # TypeScript types
+│           ├── subscription.ts
+│           └── user.ts
 ├── docs/                      # Documentation
+│   ├── INTEGRATION_GUIDE.md   # Integration guide for existing websites
+│   ├── COST_ANALYSIS.md       # Cost analysis and API usage
+│   └── ...
 └── package.json
 ```
+
+## Documentation
+
+- **[Integration Guide](../docs/INTEGRATION_GUIDE.md)** – Step-by-step guide for integrating PrepWise.AI into existing websites
+- **[Cost Analysis](../docs/COST_ANALYSIS.md)** – Detailed cost breakdown per session, API usage, and infrastructure costs
+- **[Database Schema](../docs/DATABASE_SCHEMA.md)** – Complete database schema documentation
+- **[Features Enhancement](../docs/FEATURES_ENHANCEMENT.md)** – Detailed feature documentation
+- **[Setup Instructions](../docs/SETUP_INSTRUCTIONS.md)** – Quick setup guide
+- **[Troubleshooting](../docs/TROUBLESHOOTING.md)** – Common issues and solutions
+
+## Subscription Tiers
+
+| Feature | Free | Premium | Enterprise |
+|---------|------|---------|------------|
+| Basic Interview Questions | ✅ (5) | ✅ (Unlimited) | ✅ (Unlimited) |
+| Personalized Questions | ❌ | ✅ | ✅ |
+| Recording History | ✅ (Last 3) | ✅ (Unlimited) | ✅ (Unlimited) |
+| Quizzes | ✅ (Limited) | ✅ (Unlimited) | ✅ (Unlimited) |
+| Learning Content | ✅ (Basic) | ✅ (Full Library) | ✅ (Full Library) |
+| MBA News | ✅ | ✅ | ✅ |
+| Progress Tracking | ❌ | ✅ | ✅ |
+| PDF Reports | ✅ | ✅ | ✅ |
+| Team Management | ❌ | ❌ | ✅ |
+| Custom Branding | ❌ | ❌ | ✅ |
+| API Access | ❌ | ❌ | ✅ |
 
 Happy interviewing 🚀
