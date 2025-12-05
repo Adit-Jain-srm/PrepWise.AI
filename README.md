@@ -31,9 +31,9 @@ Build an AI-Powered MBA Mock Interview Portal featuring:
 
 ## 📖 About
 
-PrepWise.AI is an Azure OpenAI-powered platform that parses a candidate's resume/essays, generates a personalized MBA interview loop, records video responses, and delivers instant AI feedback with a downloadable PDF report.
+PrepWise.AI is a comprehensive Azure OpenAI-powered MBA interview preparation platform. It parses candidate resumes/essays, generates personalized interview questions, records video responses, and delivers instant AI feedback with downloadable PDF reports.
 
-**Built in under 24 hours** for the HACKHOUND Virtual MBA Interview AI Hackathon, this project demonstrates rapid development of a production-ready AI application with comprehensive features.
+**Built in under 24 hours** for the HACKHOUND Virtual MBA Interview AI Hackathon, and **enhanced into a full platform** with premium subscriptions, personalized quizzes, learning content, MBA news feed, and recording history.
 
 The full application lives inside the `prepwise` Next.js workspace. See `prepwise/README.md` for detailed setup instructions, architecture notes, and deployment guidance.
 
@@ -52,85 +52,70 @@ PrepWise.AI/
 │   ├── src/
 │   │   ├── app/                # Next.js App Router
 │   │   │   ├── api/           # API routes
+│   │   │   │   ├── auth/      # Authentication
 │   │   │   │   ├── candidates/ # Resume parsing
+│   │   │   │   ├── dashboard/  # User dashboard
 │   │   │   │   ├── interviews/ # Interview flow APIs
-│   │   │   │   └── health/    # Health check
-│   │   │   ├── layout.tsx     # Root layout
-│   │   │   └── page.tsx       # Main page
+│   │   │   │   ├── quizzes/    # Quiz system
+│   │   │   │   ├── recordings/ # Recording history
+│   │   │   │   ├── learn/      # Learning content
+│   │   │   │   └── news/       # MBA news feed
+│   │   │   ├── dashboard/      # Dashboard page
+│   │   │   ├── history/        # Recording history page
+│   │   │   ├── interview/      # Main interview page
+│   │   │   ├── quizzes/        # Quiz pages
+│   │   │   ├── learn/          # Learning hub page
+│   │   │   ├── news/           # News feed page
+│   │   │   ├── pricing/        # Pricing page
+│   │   │   ├── layout.tsx      # Root layout
+│   │   │   └── page.tsx        # Landing page
 │   │   ├── components/        # React components
+│   │   │   ├── AuthProvider.tsx
+│   │   │   ├── PaywallGate.tsx
+│   │   │   ├── PremiumBadge.tsx
 │   │   │   ├── ResumeUploadCard.tsx
 │   │   │   ├── InterviewRecorder.tsx
 │   │   │   ├── PerformanceDashboard.tsx
-│   │   │   └── ...
+│   │   │   └── Navigation.tsx
 │   │   └── lib/               # Shared libraries
-│   │       ├── azure/         # Azure service clients
-│   │       ├── db/            # Database repositories
-│   │       ├── services/      # Business logic
-│   │       └── types/         # TypeScript types
+│   │       ├── auth/           # Auth utilities
+│   │       ├── azure/          # Azure service clients
+│   │       ├── db/             # Database repositories
+│   │       ├── services/       # Business logic
+│   │       └── types/          # TypeScript types
 │   ├── docs/                  # Project documentation
 │   ├── package.json
 │   └── README.md              # Detailed setup and architecture
 ├── docs/                      # Additional documentation
+│   ├── INTEGRATION_GUIDE.md   # Integration guide for existing websites
+│   ├── COST_ANALYSIS.md       # Cost analysis and API usage
+│   ├── DATABASE_SCHEMA.md     # Database schema
+│   ├── FEATURES_ENHANCEMENT.md # Feature documentation
 │   ├── workflow.md            # Development workflow (1-day timeline)
 │   ├── SETUP.md               # Detailed setup guide
 │   ├── TROUBLESHOOTING.md     # Troubleshooting guide
-│   ├── IMPLEMENTATION_SUMMARY.md # Implementation details
-│   └── EVALUATION_VERIFICATION.md # Evaluation engine verification
+│   └── ...
 ├── .gitignore                 # Root gitignore
 └── README.md                  # This file
 ```
 
 ## ✨ Features
 
-### 1. Resume & Essay Parsing
-- PDF/DOCX parsing with Azure OpenAI structured extraction
-- Extracts education, experience, leadership, keywords, and summary bullets
-- Optional essay prompt input (empty by default)
-- Handles null values in LLM responses gracefully
+### Core Interview Features
+- **Resume & Essay Parsing** – PDF/DOCX parsing with Azure OpenAI structured extraction
+- **Personalized Question Generation** – AI-powered questions (5 for free, 7+ for premium)
+- **Video Interview Studio** – MediaRecorder-based recording with 30s prep/60s response timers
+- **Written Essay Simulation** – 250-word target (500 max) with real-time validation
+- **AI Evaluation Engine** – Comprehensive analysis with tone, confidence, clarity, and non-verbal cues
+- **Performance Dashboard** – Interactive visualizations with Plotly.js
+- **PDF Report Generation** – Downloadable coaching reports with detailed feedback
 
-### 2. Personalized Question Generation
-- AI-powered interview questions tailored to candidate background
-- Behavioral, situational, and school-specific questions
-- Enhanced prompt engineering with detailed evaluation frameworks
-- Multiple essay prompts support (1-2 prompts per session)
-- 250-word target, 500-word maximum for essays
-
-### 3. Video Interview Studio
-- MediaRecorder-based interface with skip prep option
-- 30s prep/60s response timers with visual countdowns
-- Dual recording (video + audio) for analysis
-- Edge case handling for missing audio/video
-- Graceful error handling for recording failures
-
-### 4. Written Essay Simulation
-- 250-word target (500 max) essay responses with validation
-- Real-time word count feedback with color-coded validation
-- Multiple essay prompts support
-- Word count validation (minimum: 80% of target, maximum: 500 words)
-
-### 5. AI Evaluation Engine
-- **Comprehensive Analysis**:
-  - **Tone Analysis**: Vocal tone, confidence, engagement, professionalism
-  - **Confidence Analysis**: Vocal authority, composure, self-assurance, presence
-  - **Communication Clarity**: Structure, articulation, filler words, clarity of expression
-  - **Non-Verbal Analysis**: Eye contact, presence, composure, engagement level
-- Azure Speech SDK transcription with filler word detection
-- Speaking rate calculation (words per minute)
-- Comprehensive rubric scoring (Leadership, Communication, Clarity, Impact, Fit)
-
-### 6. Performance Dashboard
-- Interactive visualizations with Plotly.js (radar chart, bar charts)
-- Question-wise analysis with detailed insights
-- Strength playbook and growth opportunities
-- Real-time performance metrics
-- Enhanced UI with hackathon-winning design
-
-### 7. PDF Report Generation
-- Downloadable coaching reports with detailed feedback
-- Includes all analysis fields (tone, confidence, clarity, non-verbal)
-- Question-wise breakdown with strengths and improvements
-- Professional formatting and styling
-- PDFKit-based server-side generation
+### Platform Features (Enhanced)
+- **Premium Subscriptions** – Three-tier system (Free, Premium $29.99/month, Enterprise $99.99/month)
+- **Recording History** – View past interviews (last 3 for free, unlimited for premium)
+- **Personalized Quizzes** – Multiple categories with difficulty levels and instant feedback
+- **Learning Hub** – Curated videos, articles, podcasts, and courses
+- **MBA News Feed** – Latest MBA world news categorized by topic
 
 ## 🛠️ Technology Stack
 
@@ -144,10 +129,10 @@ PrepWise.AI/
 ### Backend
 - **Next.js API Routes** (serverless)
 - **TypeScript** (strict mode)
-- **Azure OpenAI** (GPT-4o) for AI capabilities
+- **Azure OpenAI** (GPT-4o-mini recommended for cost optimization) for AI capabilities
 - **Azure Speech SDK** for transcription
 - **Azure Blob Storage** for asset storage
-- **Supabase** (optional) for data persistence
+- **Supabase** for user management, subscriptions, and data persistence
 - **PDFKit** for PDF report generation
 
 ### AI Services
@@ -162,11 +147,11 @@ PrepWise.AI/
 ## 📚 Documentation
 
 - **Main Documentation**: See `prepwise/README.md` for detailed setup, architecture, and deployment
+- **Integration Guide**: See `docs/INTEGRATION_GUIDE.md` for integrating PrepWise.AI into existing websites
+- **Cost Analysis**: See `docs/COST_ANALYSIS.md` for detailed cost breakdown and API usage
 - **Setup Guide**: See `docs/SETUP.md` for step-by-step setup instructions
 - **Workflow**: See `docs/workflow.md` for development workflow and 1-day timeline
 - **Troubleshooting**: See `docs/TROUBLESHOOTING.md` for common issues and solutions
-- **Implementation**: See `docs/IMPLEMENTATION_SUMMARY.md` for technical implementation details
-- **Evaluation Verification**: See `docs/EVALUATION_VERIFICATION.md` for evaluation engine verification
 
 ## 🏆 Hackathon Submission
 
@@ -174,12 +159,16 @@ This project was developed for the **VIRTUAL MBA INTERVIEW AI HACKATHON** hosted
 
 ### ✅ Complete Feature Set
 - Resume parsing with structured extraction
-- Personalized question generation
+- Personalized question generation (tier-aware)
 - Video interview recording with skip prep option
 - Written essay simulation with validation
 - Comprehensive evaluation engine
 - Performance dashboard with visualizations
 - Downloadable PDF reports
+- Premium subscription system
+- Recording history and progress tracking
+- Personalized quizzes and learning content
+- MBA news feed
 
 ### ✅ Technical Excellence
 - Production-ready code with TypeScript strict mode
@@ -208,10 +197,10 @@ This project was developed for the **VIRTUAL MBA INTERVIEW AI HACKATHON** hosted
 
 ### Prerequisites
 - Node.js 18+
-- Azure OpenAI deployment (gpt-4o)
+- Azure OpenAI deployment (gpt-4o-mini recommended for cost optimization)
 - Azure Blob Storage account
 - Azure Speech Service
-- (Optional) Supabase project for persistence
+- Supabase project for user management and persistence
 
 ### Quick Deploy
 1. Push to GitHub
