@@ -33,7 +33,12 @@ Build an AI-Powered MBA Mock Interview Portal featuring:
 
 PrepWise.AI is a comprehensive Azure OpenAI-powered MBA interview preparation platform. It parses candidate resumes/essays, generates personalized interview questions, records video responses, and delivers instant AI feedback with downloadable PDF reports.
 
-**Built in under 24 hours** for the HACKHOUND Virtual MBA Interview AI Hackathon, and **enhanced into a full platform** with premium subscriptions, personalized quizzes, learning content, MBA news feed, and recording history.
+**Built in under 24 hours** for the HACKHOUND Virtual MBA Interview AI Hackathon, and **enhanced into a full platform** with:
+- Premium subscription tiers (Free, Premium $29.99/month, Enterprise $99.99/month)
+- Interview recording history with progress tracking
+- Personalized quiz system with multiple categories
+- Learning hub with curated content
+- MBA news feed
 
 The full application lives inside the `prepwise` Next.js workspace. See `prepwise/README.md` for detailed setup instructions, architecture notes, and deployment guidance.
 
@@ -110,7 +115,7 @@ PrepWise.AI/
 - **Performance Dashboard** – Interactive visualizations with Plotly.js
 - **PDF Report Generation** – Downloadable coaching reports with detailed feedback
 
-### Platform Features (Enhanced)
+### Platform Features
 - **Premium Subscriptions** – Three-tier system (Free, Premium $29.99/month, Enterprise $99.99/month)
 - **Recording History** – View past interviews (last 3 for free, unlimited for premium)
 - **Personalized Quizzes** – Multiple categories with difficulty levels and instant feedback
@@ -129,7 +134,7 @@ PrepWise.AI/
 ### Backend
 - **Next.js API Routes** (serverless)
 - **TypeScript** (strict mode)
-- **Azure OpenAI** (GPT-4o-mini recommended for cost optimization) for AI capabilities
+- **Azure OpenAI** (GPT-4o-mini recommended for cost optimization)
 - **Azure Speech SDK** for transcription
 - **Azure Blob Storage** for asset storage
 - **Supabase** for user management, subscriptions, and data persistence
@@ -159,13 +164,13 @@ This project was developed for the **VIRTUAL MBA INTERVIEW AI HACKATHON** hosted
 
 ### ✅ Complete Feature Set
 - Resume parsing with structured extraction
-- Personalized question generation (tier-aware)
+- Personalized question generation (tier-aware: 5 free, 7+ premium)
 - Video interview recording with skip prep option
 - Written essay simulation with validation
-- Comprehensive evaluation engine
+- Comprehensive evaluation engine (tone, confidence, clarity analysis)
 - Performance dashboard with visualizations
 - Downloadable PDF reports
-- Premium subscription system
+- Premium subscription system (Free, Premium, Enterprise)
 - Recording history and progress tracking
 - Personalized quizzes and learning content
 - MBA news feed
