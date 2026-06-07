@@ -1,4 +1,21 @@
-# PrepWise.AI – MBA Mock Interview Portal
+<div align="center">
+
+# PrepWise.AI
+
+**AI-Powered Interview Preparation Platform**
+
+[![Next.js](https://img.shields.io/badge/Next.js-14-black?logo=next.js)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?logo=typescript)](https://www.typescriptlang.org/)
+[![Google Gemini](https://img.shields.io/badge/Google_Gemini-AI-4285F4?logo=google&logoColor=white)](https://ai.google.dev/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-CSS-38B2AC?logo=tailwind-css)](https://tailwindcss.com/)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![Last Commit](https://img.shields.io/github/last-commit/Adit-Jain-srm/PrepWise.AI)](https://github.com/Adit-Jain-srm/PrepWise.AI)
+
+*Smart interview preparation with AI-generated questions, real-time feedback, and personalized coaching.*
+
+</div>
+
+---
 
 > **🚀 VIRTUAL MBA INTERVIEW AI HACKATHON**  
 > **By HACKHOUND**  
